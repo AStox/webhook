@@ -1,0 +1,25 @@
+name: webhook
+version: 1
+status: ACTIVE
+resource_size: m
+apiVersion: 3
+save_progress: false
+use_latest_snapshot: false
+sources:
+  base.logs:
+    dataset_name: base.logs
+    version: 1.0.0
+    type: dataset
+    description: Enriched logs for events emitted from contracts. Contains the
+      contract address, data, topics, decoded event and metadata for blocks and
+      transactions.
+    display_name: Logs
+transforms: {}
+sinks:
+  sink_1:
+    url: https://webhook-long-firefly-4975.fly.dev
+    type: webhook
+    headers: {}
+    description: Webhook sink from ethereum_sepolia.raw_logs
+    from: base.logs
+    secret_name: WEBHOOK_SECRET_CM3UPDBJC0
