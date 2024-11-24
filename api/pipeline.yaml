@@ -6,8 +6,8 @@ apiVersion: 3
 save_progress: false
 use_latest_snapshot: false
 sources:
-  base.logs:
-    dataset_name: base.logs
+  base-sepolia.logs:
+    dataset_name: base-sepolia.logs
     version: 1.0.0
     type: dataset
     description: Enriched logs for events emitted from contracts. Contains the
@@ -17,9 +17,9 @@ sources:
 transforms: {}
 sinks:
   sink_1:
-    url: https://webhook-long-firefly-4975.fly.dev
+    url: https://webhook.site/d06324e8-d273-45b4-a18b-c4ad69c6e7e6
     type: webhook
     headers: {}
     description: Webhook sink from ethereum_sepolia.raw_logs
-    from: base.logs
+    from: base-sepolia.logs
     secret_name: WEBHOOK_SECRET_CM3UPDBJC0

@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "name": "catseye",
+  "abis": { "catseye": { "path": "./abi.json" } },
+  "instances":
+    [
+      {
+        "abi": "catseye",
+        "address": "0x907f1588ff8ceb4B63bC9143Fac461A319C77655",
+        "startBlock": 18355489,
+        "chain": "base-sepolia"
+      }
+    ]
+}

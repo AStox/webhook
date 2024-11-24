@@ -20,7 +20,7 @@ contract CatseyeTest is Test {
         
         // Capture the queryId from the event
         vm.recordLogs();
-        catseye.query(query);
+        catseye.requestQuery(query);
         
         Vm.Log[] memory entries = vm.getRecordedLogs();
         require(entries.length > 0, "No event emitted");
@@ -39,7 +39,7 @@ contract CatseyeTest is Test {
         string memory query = "SELECT * FROM users";
         
         vm.recordLogs();
-        catseye.query(query);
+        catseye.requestQuery(query);
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 queryId = entries[0].topics[2];
         
@@ -61,7 +61,7 @@ contract CatseyeTest is Test {
         string memory query = "SELECT * FROM users";
         
         vm.recordLogs();
-        catseye.query(query);
+        catseye.requestQuery(query);
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 queryId = entries[0].topics[2];
         
@@ -79,7 +79,7 @@ contract CatseyeTest is Test {
         vm.assume(bytes(query).length > 0);
         
         vm.recordLogs();
-        catseye.query(query);
+        catseye.requestQuery(query);
         
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bytes32 queryId = entries[0].topics[2];

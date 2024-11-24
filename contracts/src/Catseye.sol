@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 contract Catseye {
-    event Query(address indexed caller, string message, bytes32 indexed queryId);
+    event QueryRequest(address indexed caller, string message, bytes32 indexed queryId);
     event QueryResult(bytes32 indexed queryId, string result);
 
     address public immutable oracle;
@@ -17,12 +17,12 @@ contract Catseye {
         return keccak256(abi.encodePacked(sender, _query, block.timestamp));
     }
 
-    function query(string memory _query) public {
+    function requestQuery(string memory _query) public {
         bytes32 queryId = generateQueryId(msg.sender, _query);
         pendingQueries[queryId] = true;
         queryOwners[queryId] = msg.sender;
         
-        emit Query(msg.sender, _query, queryId);
+        emit QueryRequest(msg.sender, _query, queryId);
     }
 
     function callback(bytes32 _queryId, string memory _result) public {
