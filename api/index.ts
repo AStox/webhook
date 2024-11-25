@@ -1,55 +1,65 @@
 import express from 'express';
 import getRawBody from 'raw-body';
+import dotenv from 'dotenv';
+
+import { queryClickHouse } from './clickhouse';
+
+dotenv.config();
 
 const app = express();
 
 // Raw request logging before any parsing
-app.use(async (req, res, next) => {
-  const timestamp = new Date().toISOString();
+app.use(async (req, res, next) => {  
   
-  console.log(`[${timestamp}] Raw Request:`, {
-    method: req.method,
+  console.log('Webhook received:', {
     url: req.url,
-    headers: req.headers,
+    contentType: req.headers['content-type'],
+    headers: req.headers
   });
 
-  try {
-    const rawBody = await getRawBody(req, {
-      length: req.headers['content-length'],
-      limit: '1mb',
-      encoding: true
-    });
-    console.log(`[${timestamp}] Raw body:`, rawBody);
-    req.body = rawBody;
-  } catch (e) {
-    console.error('Error reading raw body:', e);
+
+  if (req.headers['goldsky-webhook-secret'] !== process.env.WEBHOOK_SECRET) {
+    console.log('Webhook unauthorized');
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
   }
   
+  console.log('Webhook authorized');
   next();
 });
 
-// JSON parsing middleware with error handling
-app.use((req, res, next) => {
-  express.json()(req, res, (err) => {
-    if (err) {
-      console.error('JSON parsing error:', err);
-      return res.status(400).json({
-        error: 'Invalid JSON',
-        details: err.message
-      });
-    }
-    next();
-  });
-});
-
 // Root handler that accepts anything
-app.post('/', (req, res) => {
+app.post('/', async (req, res) => {
   console.log('Webhook received:', {
     contentType: req.headers['content-type'],
     body: req.body,
     headers: req.headers
   });
   
+  try {
+    const rawBody = await getRawBody(req, {
+      length: req.headers['content-length'],
+      limit: '1mb',
+      encoding: true
+    });
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] Raw body:`, rawBody);
+    req.body = JSON.parse(rawBody);
+    const op = req.body.op;
+    if (op === 'INSERT') {
+      const id = req.body.query_id;
+      const message = req.body.data.new.message;
+      console.log('query id:', id);
+      console.log('query:', message);
+      const data = await queryClickHouse(message);
+      console.log('data:', data);
+    } else {
+      console.log('Op:', op);
+    }
+  } catch (e) {
+    console.error('Error reading raw body:', e);
+  }
+
   res.status(200).json({ received: true });
 });
 
